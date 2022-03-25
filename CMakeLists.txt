@@ -30,7 +30,7 @@ set(HEADERS
     renderer/tests/test_blinn.h
     renderer/tests/test_helper.h
     renderer/tests/test_pbr.h
-)
+    renderer/shaders/unlit_shader.h)
 set(SOURCES
     renderer/core/camera.c
     renderer/core/darray.c
@@ -54,7 +54,7 @@ set(SOURCES
     renderer/tests/test_helper.c
     renderer/tests/test_pbr.c
     renderer/main.c
-)
+    renderer/shaders/unlit_shader.c)
 
 if(WIN32)
     set(SOURCES ${SOURCES} renderer/platforms/win32.c)

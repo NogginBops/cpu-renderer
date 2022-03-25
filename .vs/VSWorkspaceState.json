@@ -1,0 +1,10 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\renderer",
+    "\\renderer\\shaders",
+    "\\renderer\\tests"
+  ],
+  "SelectedNode": "\\renderer\\main.c",
+  "PreviewInSolutionExplorer": false
+}
