@@ -7,6 +7,12 @@
 #include "tests/test_blinn.h"
 #include "tests/test_pbr.h"
 
+#include "tests/test_helper.h"
+#include "core/mesh.h"
+#include "core/graphics.h"
+
+#include "shaders/unlit_shader.h"
+
 typedef void testfunc_t(int argc, char *argv[]);
 typedef struct {const char *testname; testfunc_t *testfunc;} testcase_t;
 
@@ -14,6 +20,68 @@ static testcase_t g_testcases[] = {
     {"blinn", test_blinn},
     {"pbr", test_pbr},
 };
+
+static void tick_function(context_t* context, void* userdata) {
+    //scene_t* scene = (scene_t*)userdata;
+    
+    vec3_t light_dir = vec3_normalize(context->light_dir);
+    camera_t* camera = context->camera;
+    perframe_t perframe;
+
+    perframe.frame_time = context->frame_time;
+    perframe.delta_time = context->delta_time;
+    perframe.light_dir = light_dir;
+    perframe.camera_pos = camera_get_position(camera);
+    perframe.light_view_matrix = mat4_identity();
+    perframe.light_proj_matrix = mat4_identity();;
+    perframe.camera_view_matrix = camera_get_view_matrix(camera);
+    perframe.camera_proj_matrix = camera_get_proj_matrix(camera);
+    perframe.ambient_intensity = 0.5f;
+    perframe.punctual_intensity = 1.0f;
+    perframe.shadow_map = NULL;
+    perframe.layer_view = -1;
+
+    framebuffer_clear_color(context->framebuffer, (vec4_t){1.0f, 0.5f, 0.8f, 1.0f});
+
+    const vec3_t position[] = {
+         {-0.5f, -0.5f, 0.0f},
+         {0.5f, -0.5f, 0.0f},
+         {0.0f, 0.5f, 0.0f},
+    };
+
+    const vec3_t colors[3] = {
+       {1.0f, 0.0f, 0.0f},
+       {0.0f, 1.0f, 0.0f},
+       {0.0f, 0.0f, 1.0f},
+    };
+
+    int sizeof_attribs = sizeof(unlit_attribs_t);
+    int sizeof_varyings = sizeof(unlit_varyings_t);
+    int sizeof_uniforms = sizeof(unlit_uniforms_t);
+    program_t *program = program_create(
+        unlit_vertex_shader,
+        unlit_fragment_shader,
+        sizeof_attribs, sizeof_varyings, sizeof_uniforms, 1, 0);
+
+    unlit_uniforms_t* uniforms = (unlit_uniforms_t*)program_get_uniforms(program);
+
+    unlit_attribs_t* attribs;
+    for (int i = 0; i < 1; i++) {
+        for (int j = 0; j < 3; j++) {
+            attribs = (unlit_attribs_t*)program_get_attribs(program, j);
+            attribs->position = position[j];
+            attribs->color = colors[j];
+        }
+        graphics_draw_triangle(context->framebuffer, program);
+    }
+
+    //test_draw_scene(scene, context->framebuffer, &perframe);
+}
+
+void test_scene(void)
+{
+    test_enter_mainloop(tick_function, NULL);
+}
 
 int main(int argc, char *argv[]) {
     int num_testcases = ARRAY_SIZE(g_testcases);
@@ -23,6 +91,12 @@ int main(int argc, char *argv[]) {
 
     srand((unsigned int)time(NULL));
     platform_initialize();
+
+    test_scene();
+
+    platform_terminate();
+    cache_cleanup();
+    return 0;
 
     if (argc > 1) {
         testname = argv[1];

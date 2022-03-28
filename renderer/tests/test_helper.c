@@ -5,11 +5,13 @@
 #include "../core/api.h"
 #include "test_helper.h"
 
+#include "../stb/stb_image_write.h"
+
 /* mainloop related functions */
 
 static const char *const WINDOW_TITLE = "Viewer";
-static const int WINDOW_WIDTH = 800;
-static const int WINDOW_HEIGHT = 600;
+static const int WINDOW_WIDTH = 200;
+static const int WINDOW_HEIGHT = 200;
 
 static const vec3_t CAMERA_POSITION = {0, 0, 1.5f};
 static const vec3_t CAMERA_TARGET = {0, 0, 0};
@@ -20,7 +22,7 @@ static const float LIGHT_SPEED = PI;
 
 static const float CLICK_DELAY = 0.25f;
 
-typedef struct {
+typedef struct { 
     /* orbit */
     int is_orbiting;
     vec2_t orbit_pos;
@@ -42,6 +44,8 @@ typedef struct {
     int single_click;
     int double_click;
     vec2_t click_pos;
+    /* screenshot */
+    int take_screenshot;
 } record_t;
 
 static vec2_t get_pos_delta(vec2_t old_pos, vec2_t new_pos) {
@@ -93,6 +97,15 @@ static void button_callback(window_t *window, button_t button, int pressed) {
 static void scroll_callback(window_t *window, float offset) {
     record_t *record = (record_t*)window_get_userdata(window);
     record->dolly_delta += offset;
+}
+
+static void key_callback(window_t* window, keycode_t key, int pressed) 
+{
+    if (key == KEY_SPACE && pressed != 0)
+    {
+        record_t *record = (record_t*)window_get_userdata(window);
+        record->take_screenshot = 1;
+    }
 }
 
 static void update_camera(window_t *window, camera_t *camera,
@@ -192,6 +205,7 @@ void test_enter_mainloop(tickfunc_t *tickfunc, void *userdata) {
     memset(&callbacks, 0, sizeof(callbacks_t));
     callbacks.button_callback = button_callback;
     callbacks.scroll_callback = scroll_callback;
+    callbacks.key_callback = key_callback;
 
     memset(&context, 0, sizeof(context_t));
     context.framebuffer = framebuffer;
@@ -229,6 +243,13 @@ void test_enter_mainloop(tickfunc_t *tickfunc, void *userdata) {
             print_time = curr_time;
         }
         prev_time = curr_time;
+
+        if (record.take_screenshot != 0)
+        {
+            stbi_flip_vertically_on_write(1);
+            stbi_write_png("test.png", framebuffer->width, framebuffer->height, 4, framebuffer->color_buffer, framebuffer->width * 4);
+            record.take_screenshot = 0;
+        }
 
         record.orbit_delta = vec2_new(0, 0);
         record.pan_delta = vec2_new(0, 0);

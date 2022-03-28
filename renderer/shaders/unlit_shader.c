@@ -4,14 +4,25 @@
 #include "unlit_shader.h"
 #include "cache_helper.h"
 
-vec4_t unlit_vertex_shader(void* attribs, void* varyings, void* uniforms)
+vec4_t unlit_vertex_shader(void* attribs_, void* varyings_, void* uniforms_)
 {
+    unlit_attribs_t* attribs = (unlit_attribs_t*)attribs_;
+    unlit_varyings_t* varyings = (unlit_varyings_t*)varyings_;
+    unlit_uniforms_t* uniforms = (unlit_uniforms_t*)uniforms_;
 
+    varyings->world_position = attribs->position;
+    varyings->color = attribs->color;
+
+    vec3_t p = attribs->position;
+    return (vec4_t) { p.x, p.y, p.z, 1.0f };
 }
 
-vec4_t unlit_fragment_shader(void* varyings, void* uniforms, int* discard, int backface) 
+vec4_t unlit_fragment_shader(void* varyings_, void* uniforms_, int* discard, int backface) 
 {
+    unlit_varyings_t* varyings = (unlit_varyings_t*)varyings_;
+    unlit_uniforms_t* uniforms = (unlit_uniforms_t*)uniforms_;
 
+    return vec4_from_vec3(varyings->color, 1.0f);
 }
 
 static void update_model(model_t* model, perframe_t* perframe) 
@@ -92,7 +103,7 @@ model_t* unlit_create_model(const char* mesh, mat4_t transform)
 	model->distance = 0;
 	model->update = update_model;
 	model->draw = draw_model;
-	
+    model->release = release_model;
 }
 
 
