@@ -10,18 +10,24 @@ vec4_t unlit_vertex_shader(void* attribs_, void* varyings_, void* uniforms_)
     unlit_varyings_t* varyings = (unlit_varyings_t*)varyings_;
     unlit_uniforms_t* uniforms = (unlit_uniforms_t*)uniforms_;
 
-    varyings->world_position = attribs->position;
+    mat4_t model_matrix = uniforms->model_matrix;
+    mat4_t camera_vp_matrix = uniforms->camera_vp_matrix;
+
+    vec4_t input_position = vec4_from_vec3(attribs->position, 1);
+    vec4_t world_position = mat4_mul_vec4(model_matrix, input_position);
+    vec4_t clip_position = mat4_mul_vec4(camera_vp_matrix, world_position);
+
+    varyings->world_position = vec3_from_vec4(world_position);
     varyings->color = attribs->color;
 
-    vec3_t p = attribs->position;
-    return (vec4_t) { p.x, p.y, p.z, 1.0f };
+    return clip_position;
 }
 
 vec4_t unlit_fragment_shader(void* varyings_, void* uniforms_, int* discard, int backface) 
 {
     unlit_varyings_t* varyings = (unlit_varyings_t*)varyings_;
     unlit_uniforms_t* uniforms = (unlit_uniforms_t*)uniforms_;
-
+    
     return vec4_from_vec3(varyings->color, 1.0f);
 }
 
@@ -29,13 +35,13 @@ static void update_model(model_t* model, perframe_t* perframe)
 {
     float ambient_intensity = perframe->ambient_intensity;
     float punctual_intensity = perframe->punctual_intensity;
-    mat4_t model_matrix = model->transform;
+    //mat4_t model_matrix = model->transform;
     unlit_uniforms_t* uniforms;
 
     uniforms = (unlit_uniforms_t*)program_get_uniforms(model->program);
     
     uniforms->camera_pos = perframe->camera_pos;
-    uniforms->model_matrix = model_matrix;
+    //uniforms->model_matrix = model_matrix;
     uniforms->camera_vp_matrix = mat4_mul_mat4(perframe->camera_proj_matrix,
         perframe->camera_view_matrix);
 }

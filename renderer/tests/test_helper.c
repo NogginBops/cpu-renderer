@@ -10,8 +10,8 @@
 /* mainloop related functions */
 
 static const char *const WINDOW_TITLE = "Viewer";
-static const int WINDOW_WIDTH = 200;
-static const int WINDOW_HEIGHT = 200;
+static const int WINDOW_WIDTH = 600;
+static const int WINDOW_HEIGHT = 600;
 
 static const vec3_t CAMERA_POSITION = {0, 0, 1.5f};
 static const vec3_t CAMERA_TARGET = {0, 0, 0};
