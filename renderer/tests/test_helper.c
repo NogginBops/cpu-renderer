@@ -6,6 +6,7 @@
 #include "test_helper.h"
 
 #include "../stb/stb_image_write.h"
+#include "../stb/cpath.h"
 
 /* mainloop related functions */
 
@@ -101,7 +102,7 @@ static void scroll_callback(window_t *window, float offset) {
 
 static void key_callback(window_t* window, keycode_t key, int pressed) 
 {
-    if (key == KEY_SPACE && pressed != 0)
+    if (key == KEY_SCREENSHOT /* && pressed != 0 */)
     {
         record_t *record = (record_t*)window_get_userdata(window);
         record->take_screenshot = 1;
@@ -249,6 +250,26 @@ void test_enter_mainloop(tickfunc_t *tickfunc, void *userdata) {
             stbi_flip_vertically_on_write(1);
             stbi_write_png("test.png", framebuffer->width, framebuffer->height, 4, framebuffer->color_buffer, framebuffer->width * 4);
             record.take_screenshot = 0;
+
+            mat4_t view_mat = camera_get_view_matrix(camera);
+            mat4_t proj_mat = camera_get_proj_matrix(camera);
+
+            cpath path = cpathFromUtf8("test.txt");
+            FILE* file = cpathOpen(&path, "w");
+            // matrix[row][col]
+            fprintf(file, "View matrix:\n%g %g %g %g\n%g %g %g %g\n%g %g %g %g\n%g %g %g %g\n",
+                view_mat.m[0][0], view_mat.m[0][1], view_mat.m[0][2], view_mat.m[0][3],
+                view_mat.m[1][0], view_mat.m[1][1], view_mat.m[1][2], view_mat.m[1][3],
+                view_mat.m[2][0], view_mat.m[2][1], view_mat.m[2][2], view_mat.m[2][3],
+                view_mat.m[3][0], view_mat.m[3][1], view_mat.m[3][2], view_mat.m[3][3]);
+
+            fprintf(file, "Proj matrix:\n%g %g %g %g\n%g %g %g %g\n%g %g %g %g\n%g %g %g %g\n",
+                proj_mat.m[0][0], proj_mat.m[0][1], proj_mat.m[0][2], proj_mat.m[0][3],
+                proj_mat.m[1][0], proj_mat.m[1][1], proj_mat.m[1][2], proj_mat.m[1][3],
+                proj_mat.m[2][0], proj_mat.m[2][1], proj_mat.m[2][2], proj_mat.m[2][3],
+                proj_mat.m[3][0], proj_mat.m[3][1], proj_mat.m[3][2], proj_mat.m[3][3]);
+
+            fclose(file);
         }
 
         record.orbit_delta = vec2_new(0, 0);

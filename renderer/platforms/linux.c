@@ -201,12 +201,13 @@ static void handle_key_event(window_t *window, int virtual_key, char pressed) {
     XFree(keysyms);
 
     switch (keysym) {
-        case XK_a:     key = KEY_A;     break;
-        case XK_d:     key = KEY_D;     break;
-        case XK_s:     key = KEY_S;     break;
-        case XK_w:     key = KEY_W;     break;
-        case XK_space: key = KEY_SPACE; break;
-        default:       key = KEY_NUM;   break;
+        case XK_a:     key = KEY_A;          break;
+        case XK_d:     key = KEY_D;          break;
+        case XK_s:     key = KEY_S;          break;
+        case XK_w:     key = KEY_W;          break;
+        case XK_space: key = KEY_SPACE;      break;
+        case XK_print: key = KEY_SCREENSHOT; break;
+        default:       key = KEY_NUM;        break;
     }
     if (key < KEY_NUM) {
         window->keys[key] = pressed;

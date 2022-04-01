@@ -31,7 +31,8 @@ set(HEADERS
     renderer/tests/test_helper.h
     renderer/tests/test_pbr.h
     renderer/shaders/unlit_shader.h
-    renderer/stb/stb_image_write.h)
+    renderer/stb/stb_image_write.h
+    renderer/stb/cpath.h)
 set(SOURCES
     renderer/core/camera.c
     renderer/core/darray.c

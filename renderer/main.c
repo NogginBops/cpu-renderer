@@ -74,7 +74,7 @@ static void tick_function(context_t* context, void* userdata) {
     perframe.light_dir = light_dir;
     perframe.camera_pos = camera_get_position(camera);
     perframe.light_view_matrix = mat4_identity();
-    perframe.light_proj_matrix = mat4_identity();;
+    perframe.light_proj_matrix = mat4_identity();
     perframe.camera_view_matrix = camera_get_view_matrix(camera);
     perframe.camera_proj_matrix = camera_get_proj_matrix(camera);
     perframe.ambient_intensity = 0.5f;

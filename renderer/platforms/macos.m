@@ -110,12 +110,13 @@ void platform_terminate(void) {
 static void handle_key_event(window_t *window, int virtual_key, char pressed) {
     keycode_t key;
     switch (virtual_key) {
-        case 0x00: key = KEY_A;     break;
-        case 0x02: key = KEY_D;     break;
-        case 0x01: key = KEY_S;     break;
-        case 0x0D: key = KEY_W;     break;
-        case 0x31: key = KEY_SPACE; break;
-        default:   key = KEY_NUM;   break;
+        case 0x00: key = KEY_A;          break;
+        case 0x02: key = KEY_D;          break;
+        case 0x01: key = KEY_S;          break;
+        case 0x0D: key = KEY_W;          break;
+        case 0x31: key = KEY_SPACE;      break;
+        case 0x24: key = KEY_SCREENSHOT; break; // FIXME: Atm we use kVK_Return...
+        default:   key = KEY_NUM;        break;
     }
     if (key < KEY_NUM) {
         window->keys[key] = pressed;
