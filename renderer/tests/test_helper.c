@@ -270,6 +270,8 @@ void test_enter_mainloop(tickfunc_t *tickfunc, void *userdata) {
                 proj_mat.m[3][0], proj_mat.m[3][1], proj_mat.m[3][2], proj_mat.m[3][3]);
 
             fclose(file);
+
+            printf("Took screenshot\n");
         }
 
         record.orbit_delta = vec2_new(0, 0);
